@@ -15,6 +15,11 @@ public class Main {
 		String fileName = defaultFilename;
 		if (args.length == 1) {
 			fileName = args[0];
+		} else {
+			fileName = View.startFileChooser();
+			if (fileName == null) {
+				fileName = defaultFilename;
+			}
 		}
 		if (!fileName.endsWith(".txt")) {
 			Log.e("file name not in type .txt: " + fileName);

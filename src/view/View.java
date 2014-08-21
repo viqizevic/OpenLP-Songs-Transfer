@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import javax.swing.JFileChooser;
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 public class View {
 
 	public static void writeFile(String filename, String content) {
@@ -40,5 +43,17 @@ public class View {
 			Log.e("Unable to create new folder: " + folderName);
 		}
 		return created;
+	}
+
+	public static String startFileChooser() {
+		String fileName = null;
+		JFileChooser fc = new JFileChooser();
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.doc, *.txt", "doc", "txt");
+		fc.setFileFilter(filter);
+		int returnVal = fc.showOpenDialog(null);
+		if (returnVal == JFileChooser.APPROVE_OPTION) {
+			fileName = fc.getSelectedFile().getAbsolutePath();
+		}
+		return fileName;
 	}
 }
