@@ -114,26 +114,26 @@ public class DB {
 							song.addNewPart(paragraph);
 						}
 					}
+				} else {
+					if (emptyPreLine && !emptyLine && !(titleIsInLine || authorInfoIsInLine)) {
+						inParagraph = true;
+						paragraph = "";
+					} else if (!emptyLine && emptyPostLine && !(titleIsInLine || authorInfoIsInLine) && (paragraph != null)) {
+						inParagraph = false;
+						paragraph += line + "\n";
+						if (song == null) {
+							// TODO: If no title found, use the first line of the first vers
+							Log.e("Unable to add new part, since no title was found!");
+						} else {
+							song.addNewPart(paragraph);
+						}
+					}
 				}
 				
 				if (titleIsInLine) {
 					paragraph = null;
 					inParagraph = false;
 					songNr++;
-				}
-				
-				if (emptyPreLine && !emptyLine && !(titleIsInLine || authorInfoIsInLine)) {
-					inParagraph = true;
-					paragraph = "";
-				} else if (!emptyLine && emptyPostLine && !(titleIsInLine || authorInfoIsInLine) && (paragraph != null)) {
-					inParagraph = false;
-					paragraph += line + "\n";
-					if (song == null) {
-						// TODO: If no title found, use the first line of the first vers
-						Log.e("Unable to add new part, since no title was found!");
-					} else {
-						song.addNewPart(paragraph);
-					}
 				}
 				
 				if (inParagraph && (paragraph != null)) {
@@ -143,7 +143,7 @@ public class DB {
 				line = postLine;
 			}
 			br.close();
-//			View.deleteFile(cleanFileName);
+			View.deleteFile(cleanFileName);
 			db.checkSongs();
 		} catch (FileNotFoundException e) {
 			Log.e("Cannot find file: " + fileName);
