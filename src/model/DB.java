@@ -217,8 +217,8 @@ public class DB {
 		String line;
 		String content = "";
 		int c8232 = 0;
-		boolean isChordLine = false;
 		int cChordLines = 0;
+		int possibleChordLines = 0;
 		while ((line = br.readLine()) != null) {
 			// trim and replace two or more white spaces
 			String cleanLine = line.replaceAll("\\s+", " ").trim();
@@ -234,16 +234,24 @@ public class DB {
 				}
 			}
 			// check if this is a line with chords
-			isChordLine = false;
-			int sumWordLength = 0;
-			String[] arr = cleanLine.replaceAll("#", "").replace("7","").replace("/","").replace("(","").replace(")","").replace("-","").split("\\s+");
+			boolean isChordLine = false;
+			String notes = "^[CDEFGAB]";
+			String accidentals = "[#b]?";
+			String chords = "(m|maj|min|sus)?";
+			String number = "[2479]?";
+			String regex = notes + accidentals + chords + number;
+			String[] arr = cleanLine.replace('/', ' ').replace('-', ' ').split("\\s+");
+			int match = 0;
 			for (String s : arr) {
-				sumWordLength += s.trim().length();
+				if (s.matches(regex)) {
+					match++;
+				}
 			}
-			double meanWordLength = (sumWordLength+0.0)/arr.length;
-			if (0 < meanWordLength && meanWordLength <= 2.25) {
+			if (match == arr.length) {
 				isChordLine = true;
 				cChordLines++;
+			} else if (match > 1) {
+				possibleChordLines++;
 			}
 			// do not add the line with chords
 			if (!isChordLine) {
@@ -256,6 +264,9 @@ public class DB {
 		}
 		if (cChordLines > 0) {
 			Log.p("Remove chord line " + cChordLines + " time(s)");
+		}
+		if (possibleChordLines > 0) {
+			Log.p("Possible chord line not removed found " + possibleChordLines + " time(s)");
 		}
 		View.writeFile(cleanFilename, content);
 		Log.p("Finish creating clean version file: " + cleanFilename);
