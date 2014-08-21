@@ -36,12 +36,13 @@ public class Main {
 		for (String title : DB.getDB().getTitles()) {
 			Song s = DB.getDB().getSong(title);
 			String content = s.getExportFileContent();
-			Log.p(s.toString());
+//			Log.p(s.toString());
 			View.writeFile(folder + "/" + title + ".txt", content);
 		}
 
 		Log.p("End of transfer");
-
+		
+		Log.writeLogFile();
 	}
 	
 }
