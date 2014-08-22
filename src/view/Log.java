@@ -10,6 +10,7 @@ public class Log {
 	}
 	
 	public static void e(String message) {
+		message = "ERROR: " + message;
 		System.err.println(message);
 		addToLogFile(message);
 	}

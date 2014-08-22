@@ -48,7 +48,7 @@ public class View {
 	public static String startFileChooser() {
 		String fileName = null;
 		JFileChooser fc = new JFileChooser();
-		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.doc, *.txt", "doc", "txt");
+		FileNameExtensionFilter filter = new FileNameExtensionFilter("*.txt", "txt");
 		fc.setFileFilter(filter);
 		int returnVal = fc.showOpenDialog(null);
 		if (returnVal == JFileChooser.APPROVE_OPTION) {

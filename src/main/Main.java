@@ -1,5 +1,7 @@
 package main;
 
+import java.io.File;
+
 import model.DB;
 import model.Song;
 import view.Log;
@@ -18,23 +20,28 @@ public class Main {
 		} else {
 			fileName = View.startFileChooser();
 			if (fileName == null) {
-				fileName = defaultFilename;
+				Log.e("Cancel choosing input file");
+				endOfMain();
+				return;
 			}
 		}
 		if (!fileName.endsWith(".txt")) {
-			Log.e("file name not in type .txt: " + fileName);
+			Log.e("File name not in type .txt: " + fileName);
+			endOfMain();
 			return;
 		}
 		DB.getDB().readFile(fileName);
 		
 		if (DB.getDB().getTitles().length == 0) {
 			Log.e("No song found!");
+			endOfMain();
 			return;
 		}
 		Log.p(DB.getDB().getTitles().length + " song(s) found!");
 		
-		String folder = "output_" + defaultFilename.replaceAll(".txt", "");
+		String folder = "output_" + new File(fileName).getName().replaceAll(".txt", "");
 		if (!View.createFolderIfNotExists(folder)) {
+			endOfMain();
 			return;
 		}
 		
@@ -46,7 +53,10 @@ public class Main {
 		}
 
 		Log.p("End of transfer");
-		
+		endOfMain();
+	}
+	
+	private static void endOfMain() {
 		Log.writeLogFile();
 	}
 	
