@@ -338,8 +338,8 @@ public class DB {
 			return;
 		}
 		LinkedList<String> order = song.getPartsOrder();
-		String v = "Vers ";
-		String c = "Chorus ";
+		String v = Song.VERS;
+		String c = Song.CHORUS + " ";
 		LinkedList<String> newOrder = new LinkedList<String>();
 		// determine the number of verses before a chorus
 		int nrOfVbeforeC = 0;

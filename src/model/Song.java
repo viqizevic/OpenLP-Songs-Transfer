@@ -7,6 +7,10 @@ import view.Log;
 
 public class Song {
 	
+	public static final String VERS = "Vers";
+	
+	public static final String CHORUS = "Chorus";
+	
 	private String title;
 	
 	private HashMap<String, String> parts;
@@ -75,22 +79,22 @@ public class Song {
 		if (text.charAt(text.length()-1) == '\n') {
 			text = text.substring(0, text.length()-1);
 		}
-		String name = "Vers ";
+		String name = VERS;
 		int i = totalVersNumber+1;
 		if (!isChorus) {
 			totalVersNumber++;
 		} else {
-			name = "Chorus ";
+			name = CHORUS;
 			i = totalChorusNumber+1;
 			totalChorusNumber++;
 		}
-		String partName = name+i;
+		String partName = name + " " + i;
 		addPart(partName, text);
 		partsOrder.add(partName);
 		if (needChorusAsNext) {
-			name = "Chorus ";
+			name = CHORUS;
 			i = totalChorusNumber;
-			partName = name+i;
+			partName = name + " " + i;
 			partsOrder.add(partName);
 		}
 	}
@@ -137,14 +141,48 @@ public class Song {
 
 	public String getExportFileContent() {
 		String s = title + "\n\n\n";
+		
+		// Try to combine vers and chorus in one slide
+		int m = 10;
+		int counterCombined = 0;
+		LinkedList<String> newPartsOrder = new LinkedList<String>();
+		int n = partsOrder.size();
+		int j = 0;
+		while (j < n) {
+			boolean combinedWithNextPart = false;
+			String currentPart = partsOrder.get(j);
+			if (j < n-1) {
+				String nextPart = partsOrder.get(j+1);
+				String currentPartText = parts.get(currentPart);
+				String nextPartText = parts.get(nextPart);
+				if (currentPartText != null && nextPartText != null) {
+					int currentPartLines = currentPartText.split("\\n").length;
+					int nextPartLines = nextPartText.split("\\n").length;
+					if (currentPartLines + nextPartLines <= m) {
+						parts.put(currentPart, currentPartText + "\n" + nextPartText);
+						combinedWithNextPart = true;
+					}
+				}
+			}
+			j++;
+			newPartsOrder.add(currentPart);
+			if (combinedWithNextPart) {
+				counterCombined++;
+				j++;
+			}
+		}
+		partsOrder = newPartsOrder;
+		if (counterCombined > 0) {
+			Log.p("Combined slide " + counterCombined + " time(s)");
+		}
+		
+		int i = 1;
 		for (String k : partsOrder) {
 			String text = parts.get(k);
-			String[] arr = k.split(" ");
-			if (arr[0].equals("Vers")) {
-				text += " (" + arr[1] + "/" + totalVersNumber + ")";
-			}
+			text += " (" + i++ + "/" + partsOrder.size() + ")";
 			s += k + "\n" + text + "\n\n";
 		}
+		/* Remove this info for now
 		s += ccliNumber + "\n";
 //		if (composer != null && !composer.equals("")) {
 //			s += composer + "\n";
@@ -152,18 +190,18 @@ public class Song {
 //		s += copyright + "\n";
 		s += ccliLicenseNumber + "\n";
 		s += comment + "\n";
+		*/
 		return s;
 	}
 	
 	public String toString() {
 		String s = title + "\n";
 		for (String k : partsOrder) {
-			s += k + " ";
+			String text = parts.get(k);
+			String[] arr = text.split("\\n");
+			s += k + " " + arr.length + " ";
 		}
 		s += "\n";
-		if (composer != null && !composer.equals("")) {
-			s += composer + "\n";
-		}
 		return s;
 	}
 
